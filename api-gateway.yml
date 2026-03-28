@@ -1,1 +1,75 @@
 
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+
+            # ================= USER SERVICE =================
+            - id: auth-route
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/auth/**
+
+            - id: users-route
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/users/**
+
+            - id: mentors-route
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/mentors/**
+
+
+            # ================= SESSION SERVICE =================
+            - id: session-route
+              uri: lb://SESSION-SERVICE
+              predicates:
+                - Path=/sessions/**
+
+
+            # ================= LEARNING SERVICE =================
+            - id: skills-route
+              uri: lb://LEARNING-SERVICE
+              predicates:
+                - Path=/skills/**
+
+            - id: groups-route
+              uri: lb://LEARNING-SERVICE
+              predicates:
+                - Path=/groups/**
+
+            - id: reviews-route
+              uri: lb://LEARNING-SERVICE
+              predicates:
+                - Path=/reviews/**
+
+
+# ================= EUREKA =================
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+
+# ================= ZIPKIN =================
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
