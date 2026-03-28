@@ -1,4 +1,3 @@
-
 server:
   port: 8080
 
@@ -11,7 +10,6 @@ spring:
       server:
         webflux:
           routes:
-
             # ================= USER SERVICE =================
             - id: auth-route
               uri: lb://USER-SERVICE
@@ -28,13 +26,11 @@ spring:
               predicates:
                 - Path=/mentors/**
 
-
             # ================= SESSION SERVICE =================
             - id: session-route
               uri: lb://SESSION-SERVICE
               predicates:
                 - Path=/sessions/**
-
 
             # ================= LEARNING SERVICE =================
             - id: skills-route
@@ -52,13 +48,46 @@ spring:
               predicates:
                 - Path=/reviews/**
 
+            # ================= SWAGGER AGGREGATION MAPS =================
+            - id: swagger-user
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/v3/api-docs/user
+              filters:
+                - RewritePath=/v3/api-docs/user, /v3/api-docs
+
+            - id: swagger-session
+              uri: lb://SESSION-SERVICE
+              predicates:
+                - Path=/v3/api-docs/session
+              filters:
+                - RewritePath=/v3/api-docs/session, /v3/api-docs
+
+            - id: swagger-learning
+              uri: lb://LEARNING-SERVICE
+              predicates:
+                - Path=/v3/api-docs/learning
+              filters:
+                - RewritePath=/v3/api-docs/learning, /v3/api-docs
+
+# ================= SWAGGER DROP-DOWN UI =================
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    urls:
+      - name: User Service
+        url: /v3/api-docs/user
+      - name: Session Service
+        url: /v3/api-docs/session
+      - name: Learning Service
+        url: /v3/api-docs/learning
 
 # ================= EUREKA =================
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
-
   instance:
     hostname: localhost
     prefer-ip-address: true
@@ -69,7 +98,6 @@ management:
   tracing:
     sampling:
       probability: 1.0
-
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
